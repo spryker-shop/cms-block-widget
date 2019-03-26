@@ -11,44 +11,29 @@ use ArrayObject;
 use DateTime;
 use Generated\Shared\Transfer\CmsBlockTransfer;
 use Generated\Shared\Transfer\SpyCmsBlockEntityTransfer;
-use Silex\Application;
-use Spryker\Yves\Kernel\AbstractPlugin;
-use Spryker\Yves\Twig\Plugin\TwigFunctionPluginInterface;
+use SprykerShop\Yves\ShopApplication\Plugin\AbstractTwigExtensionPlugin;
 use Twig\Environment;
 use Twig\TwigFunction;
 
 /**
- * @deprecated Use `SprykerShop\Yves\CmsBlockWidget\Plugin\Twig\TwigCmsBlockWidgetPlugin` instead.
- *
  * @method \SprykerShop\Yves\CmsBlockWidget\CmsBlockWidgetFactory getFactory()
  */
-class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
+class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
 {
     public const OPTION_NAME = 'name';
     public const OPTION_POSITION = 'position';
 
-    /**
-     * @var string
-     */
-    protected $localeName;
+    protected const SERVICE_STORE = 'store';
+    protected const SERVICE_LOCALE = 'locale';
+    protected const SPY_CMS_BLOCK_TWIG_FUNCTION = 'spyCmsBlock';
 
     /**
-     * @var string
-     */
-    protected $storeName;
-
-    /**
-     * @param \Silex\Application $application
-     *
      * @return \Twig\TwigFunction[]
      */
-    public function getFunctions(Application $application)
+    public function getFunctions(): array
     {
-        $this->localeName = $application['locale'];
-        $this->storeName = $application['store'];
-
         return [
-            new TwigFunction('spyCmsBlock', [
+            new TwigFunction(static::SPY_CMS_BLOCK_TWIG_FUNCTION, [
                 $this,
                 'renderCmsBlock',
             ], [
@@ -66,7 +51,7 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return string
      */
-    public function renderCmsBlock(Environment $twig, array $context, array $blockOptions = [])
+    public function renderCmsBlock(Environment $twig, array $context, array $blockOptions = []): string
     {
         $blocks = $this->getBlockDataByOptions($blockOptions);
         $rendered = '';
@@ -92,16 +77,19 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return array
      */
-    protected function getBlockDataByOptions(array &$blockOptions)
+    protected function getBlockDataByOptions(array &$blockOptions): array
     {
         $blockName = $this->extractBlockNameOption($blockOptions);
         $positionName = $this->extractPositionOption($blockOptions);
 
-        $availableBlockNames = $this->getFactory()->getCmsBlockStorageClient()->findBlockNamesByOptions($blockOptions, $this->localeName);
+        $localeName = $this->getLocaleName();
+        $storeName = $this->getStoreName();
+
+        $availableBlockNames = $this->getFactory()->getCmsBlockStorageClient()->findBlockNamesByOptions($blockOptions, $localeName);
         $availableBlockNames = $this->filterPosition($positionName, $availableBlockNames);
         $availableBlockNames = $this->filterAvailableBlockNames($blockName, $availableBlockNames);
 
-        return $this->getFactory()->getCmsBlockStorageClient()->findBlocksByNames($availableBlockNames, $this->localeName, $this->storeName);
+        return $this->getFactory()->getCmsBlockStorageClient()->findBlocksByNames($availableBlockNames, $localeName, $storeName);
     }
 
     /**
@@ -109,9 +97,9 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return string
      */
-    protected function extractPositionOption(array &$blockOptions)
+    protected function extractPositionOption(array &$blockOptions): string
     {
-        $positionName = isset($blockOptions[static::OPTION_POSITION]) ? $blockOptions[static::OPTION_POSITION] : '';
+        $positionName = $blockOptions[static::OPTION_POSITION] ?? '';
         $positionName = strtolower($positionName);
         unset($blockOptions[static::OPTION_POSITION]);
 
@@ -124,22 +112,22 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return array
      */
-    protected function filterPosition($positionName, array $availableBlockNames)
+    protected function filterPosition(string $positionName, array $availableBlockNames): array
     {
         if (is_array(current($availableBlockNames))) {
-            return isset($availableBlockNames[$positionName]) ? $availableBlockNames[$positionName] : [];
+            return $availableBlockNames[$positionName] ?? [];
         }
 
         return $availableBlockNames;
     }
 
     /**
-     * @param string $blockName
+     * @param string|null $blockName
      * @param array $availableBlockNames
      *
      * @return array
      */
-    protected function filterAvailableBlockNames($blockName, array $availableBlockNames)
+    protected function filterAvailableBlockNames(?string $blockName, array $availableBlockNames): array
     {
         $blockNameKey = $this->generateBlockNameKey($blockName);
 
@@ -157,7 +145,7 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
     /**
      * @return \Generated\Shared\Transfer\CmsBlockTransfer
      */
-    protected function createBlockTransfer()
+    protected function createBlockTransfer(): CmsBlockTransfer
     {
         $cmsBlockTransfer = new CmsBlockTransfer();
 
@@ -167,11 +155,11 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
     /**
      * @param array $blockOptions
      *
-     * @return string
+     * @return string|null
      */
-    protected function extractBlockNameOption(array &$blockOptions)
+    protected function extractBlockNameOption(array &$blockOptions): ?string
     {
-        $blockName = isset($blockOptions[static::OPTION_NAME]) ? $blockOptions[static::OPTION_NAME] : null;
+        $blockName = $blockOptions[static::OPTION_NAME] ?? null;
         unset($blockOptions[static::OPTION_NAME]);
 
         return $blockName;
@@ -182,17 +170,17 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return bool
      */
-    protected function validateBlock(SpyCmsBlockEntityTransfer $cmsBlockData)
+    protected function validateBlock(SpyCmsBlockEntityTransfer $cmsBlockData): bool
     {
         return $cmsBlockData->getCmsBlockTemplate() !== null;
     }
 
     /**
-     * @param string $blockName
+     * @param string|null $blockName
      *
      * @return string
      */
-    protected function generateBlockNameKey($blockName)
+    protected function generateBlockNameKey(?string $blockName): string
     {
         return $this->getFactory()->getCmsBlockStorageClient()->generateBlockNameKey($blockName);
     }
@@ -202,7 +190,7 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return bool
      */
-    protected function validateDates(SpyCmsBlockEntityTransfer $spyCmsBlockTransfer)
+    protected function validateDates(SpyCmsBlockEntityTransfer $spyCmsBlockTransfer): bool
     {
         $dateToCompare = new DateTime();
 
@@ -230,7 +218,7 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return array
      */
-    protected function getPlaceholders(ArrayObject $mappings)
+    protected function getPlaceholders(ArrayObject $mappings): array
     {
         $placeholders = [];
         foreach ($mappings as $mapping) {
@@ -245,8 +233,24 @@ class TwigCmsBlock extends AbstractPlugin implements TwigFunctionPluginInterface
      *
      * @return \Generated\Shared\Transfer\SpyCmsBlockEntityTransfer
      */
-    protected function getCmsBlockTransfer(array $data)
+    protected function getCmsBlockTransfer(array $data): SpyCmsBlockEntityTransfer
     {
         return (new SpyCmsBlockEntityTransfer())->fromArray($data, true);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLocaleName(): string
+    {
+        return $this->getApplication()->get(static::SERVICE_LOCALE);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStoreName(): string
+    {
+        return $this->getApplication()->get(static::SERVICE_STORE);
     }
 }
