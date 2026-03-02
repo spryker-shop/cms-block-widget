@@ -12,11 +12,6 @@ use Generated\Shared\Transfer\CmsBlockTransfer;
 
 class CmsBlockValidator implements CmsBlockValidatorInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\CmsBlockTransfer $cmsBlockTransfer
-     *
-     * @return bool
-     */
     public function isValid(CmsBlockTransfer $cmsBlockTransfer): bool
     {
         return $cmsBlockTransfer->getIsActive() &&
@@ -24,11 +19,6 @@ class CmsBlockValidator implements CmsBlockValidatorInterface
             $this->isDateValid($cmsBlockTransfer);
     }
 
-    /**
-     * @param \Generated\Shared\Transfer\CmsBlockTransfer $cmsBlockTransfer
-     *
-     * @return bool
-     */
     protected function isDateValid(CmsBlockTransfer $cmsBlockTransfer): bool
     {
         $dateToCompare = new DateTime();

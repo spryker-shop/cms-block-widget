@@ -57,11 +57,6 @@ class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
         ];
     }
 
-    /**
-     * @param string $locale
-     *
-     * @return \Twig\TwigFunction
-     */
     protected function createCmsBlockTwigFunction(string $locale): TwigFunction
     {
         return new TwigFunction(
@@ -90,12 +85,6 @@ class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
         );
     }
 
-    /**
-     * @param \Twig\Environment $twig
-     * @param array $cmsBlock
-     *
-     * @return string
-     */
     protected function renderCmsBlock(Environment $twig, array $cmsBlock): string
     {
         $cmsBlockTransfer = $this->mapCmsBlockToTransfer($cmsBlock);
@@ -127,11 +116,6 @@ class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
         return $placeholders;
     }
 
-    /**
-     * @param array $cmsBlock
-     *
-     * @return \Generated\Shared\Transfer\CmsBlockTransfer
-     */
     protected function mapCmsBlockToTransfer(array $cmsBlock): CmsBlockTransfer
     {
         $cmsBlockTransfer = (new CmsBlockTransfer())->fromArray($cmsBlock, true);

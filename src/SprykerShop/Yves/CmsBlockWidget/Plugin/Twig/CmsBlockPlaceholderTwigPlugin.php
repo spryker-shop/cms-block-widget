@@ -35,9 +35,6 @@ class CmsBlockPlaceholderTwigPlugin extends AbstractTwigExtensionPlugin
         ];
     }
 
-    /**
-     * @return \Twig\TwigFunction
-     */
     protected function createCmsBlockPlaceholderTwigFunction(): TwigFunction
     {
         return new TwigFunction(
@@ -53,12 +50,6 @@ class CmsBlockPlaceholderTwigPlugin extends AbstractTwigExtensionPlugin
         );
     }
 
-    /**
-     * @param string $identifier
-     * @param array $context
-     *
-     * @return string
-     */
     protected function getTranslation(string $identifier, array $context): string
     {
         $placeholders = $context['placeholders'];
@@ -78,13 +69,6 @@ class CmsBlockPlaceholderTwigPlugin extends AbstractTwigExtensionPlugin
         return $translation;
     }
 
-    /**
-     * @param string $translation
-     * @param string $identifier
-     * @param array $context
-     *
-     * @return string
-     */
     protected function renderCmsTwigContent(string $translation, string $identifier, array $context): string
     {
         $renderedTwigContent = $this->getFactory()
@@ -94,11 +78,6 @@ class CmsBlockPlaceholderTwigPlugin extends AbstractTwigExtensionPlugin
         return $renderedTwigContent[$identifier];
     }
 
-    /**
-     * @param string $translation
-     *
-     * @return bool
-     */
     protected function isGlossaryKey(string $translation): bool
     {
         return strpos($translation, static::CMS_BLOCK_PREFIX_KEY) === 0;

@@ -17,17 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CmsBlockWidgetFactory extends AbstractFactory
 {
-    /**
-     * @return \SprykerShop\Yves\CmsBlockWidget\Validator\CmsBlockValidatorInterface
-     */
     public function createCmsBlockValidator(): CmsBlockValidatorInterface
     {
         return new CmsBlockValidator();
     }
 
-    /**
-     * @return \SprykerShop\Yves\CmsBlockWidget\Dependency\Client\CmsBlockWidgetToStoreClientInterface
-     */
     public function getStoreClient(): CmsBlockWidgetToStoreClientInterface
     {
         return $this->getProvidedDependency(CmsBlockWidgetDependencyProvider::CLIENT_STORE);
@@ -41,25 +35,16 @@ class CmsBlockWidgetFactory extends AbstractFactory
         return $this->getProvidedDependency(CmsBlockWidgetDependencyProvider::TWIG_EXTENSION_PLUGINS);
     }
 
-    /**
-     * @return \SprykerShop\Yves\CmsBlockWidget\Dependency\Client\CmsBlockWidgetToCmsBlockStorageClientInterface
-     */
     public function getCmsBlockStorageClient(): CmsBlockWidgetToCmsBlockStorageClientInterface
     {
         return $this->getProvidedDependency(CmsBlockWidgetDependencyProvider::CLIENT_CMS_BLOCK_STORAGE);
     }
 
-    /**
-     * @return \Spryker\Yves\CmsContentWidget\Plugin\CmsTwigContentRendererPluginInterface
-     */
     public function getCmsTwigContentRendererPlugin(): CmsTwigContentRendererPluginInterface
     {
         return $this->getProvidedDependency(CmsBlockWidgetDependencyProvider::CMS_TWIG_CONTENT_RENDERER_PLUGIN);
     }
 
-    /**
-     * @return \Symfony\Contracts\Translation\TranslatorInterface
-     */
     public function getTranslatorService(): TranslatorInterface
     {
         return $this->getProvidedDependency(CmsBlockWidgetDependencyProvider::SERVICE_TRANSLATOR);

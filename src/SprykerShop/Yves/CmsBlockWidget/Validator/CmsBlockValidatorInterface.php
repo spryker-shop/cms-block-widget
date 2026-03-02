@@ -11,10 +11,5 @@ use Generated\Shared\Transfer\CmsBlockTransfer;
 
 interface CmsBlockValidatorInterface
 {
-    /**
-     * @param \Generated\Shared\Transfer\CmsBlockTransfer $cmsBlockTransfer
-     *
-     * @return bool
-     */
     public function isValid(CmsBlockTransfer $cmsBlockTransfer): bool;
 }
