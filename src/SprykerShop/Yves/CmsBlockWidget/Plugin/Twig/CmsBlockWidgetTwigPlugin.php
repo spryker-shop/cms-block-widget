@@ -20,6 +20,8 @@ use Twig\TwigFunction;
  */
 class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
 {
+    protected static ?string $storeName = null;
+
     /**
      * @var string
      */
@@ -62,10 +64,7 @@ class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
         return new TwigFunction(
             static::FUNCTION_NAME_SPY_CMS_BLOCK,
             function (Environment $twig, array $context, array $blockOptions = []) use ($locale): string {
-                $storeName = $this->getFactory()
-                    ->getStoreClient()
-                    ->getCurrentStore()
-                    ->getName();
+                $storeName = $this->getStoreName();
                 $cmsBlocks = $this->getFactory()
                     ->getCmsBlockStorageClient()
                     ->getCmsBlocksByOptions($blockOptions, $locale, $storeName);
@@ -83,6 +82,18 @@ class CmsBlockWidgetTwigPlugin extends AbstractTwigExtensionPlugin
                 'is_safe' => ['html'],
             ],
         );
+    }
+
+    protected function getStoreName(): string
+    {
+        if (static::$storeName === null) {
+            static::$storeName = $this->getFactory()
+                ->getStoreClient()
+                ->getCurrentStore()
+                ->getName();
+        }
+
+        return static::$storeName;
     }
 
     protected function renderCmsBlock(Environment $twig, array $cmsBlock): string
